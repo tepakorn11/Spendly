@@ -117,7 +117,7 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
 .setbtn{font-family:inherit;width:100%;border:2.5px solid var(--ink);border-radius:15px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;color:var(--ink);box-shadow:0 3px 0 var(--ink);transition:.15s;display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:11px}
 .setbtn .ic{font-size:18px}
 .setbtn:last-child{margin-bottom:0}
-.setbtn.mint{background:var(--mint)}.setbtn.sky{background:var(--sky)}.setbtn.rose{background:var(--rose)}
+.setbtn.mint{background:var(--mint)}.setbtn.sky{background:var(--sky)}.setbtn.rose{background:var(--rose)}.setbtn.butter{background:var(--butter)}
 .setbtn:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
 
 .confirm-modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);z-index:60;
@@ -251,8 +251,9 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
         <div class="cs">ข้อมูลถูกบันทึกในเครื่องอัตโนมัติ และสำรอง/ย้ายเป็นไฟล์ JSON ได้</div>
         <div class="setrow"><div class="setinfo"><div class="sn">รายการทั้งหมด</div><div class="sd" id="setCount">0 รายการ</div></div></div>
         <button class="setbtn mint" id="exportBtn"><span class="ic" data-i="download"></span>ดาวน์โหลดไฟล์ JSON (สำรองข้อมูล)</button>
-        <button class="setbtn sky" id="importBtn"><span class="ic" data-i="upload"></span>นำเข้าไฟล์ JSON (กู้คืน/ย้ายเครื่อง)</button>
-        <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+        <button class="setbtn sky" id="importBtn"><span class="ic" data-i="upload"></span>นำเข้าไฟล์ (JSON หรือ CSV)</button>
+        <input type="file" id="importFile" accept=".json,.csv,application/json,text/csv" style="display:none">
+        <button class="setbtn butter" id="tmplBtn"><span class="ic" data-i="file"></span>ดาวน์โหลด template CSV (กรอกใน Excel)</button>
         <button class="setbtn rose" id="clearBtn"><span class="ic" data-i="trash"></span>ล้างข้อมูลทั้งหมด</button>
       </div>
       <div class="card">
@@ -320,6 +321,7 @@ const ICONS={
   game:'<path d="M7 9h2"/><path d="M8 8v2"/><path d="M15 9h.01"/><path d="M17 11h.01"/><path d="M6.5 6h11a4 4 0 0 1 4 4l.8 5a2.5 2.5 0 0 1-4.7 1.4L16 14H8l-1.6 2.4A2.5 2.5 0 0 1 1.7 15l.8-5a4 4 0 0 1 4-4Z"/>',
   box:'<path d="M3 8 12 3l9 5v8l-9 5-9-5z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/>',
   trash:'<path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/><path d="M9 7V4h6v3"/>',
+  file:'<path d="M14 3v5h5"/><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M9 13h6"/><path d="M9 17h6"/>',
   alert:'<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
   carrot:'<path d="M2 22l8-8"/><path d="M12 9a5 5 0 0 0-7 7l3-1 4-4z"/><path d="M14 8s1-3 4-3"/><path d="M16 10s3-1 3-4"/>',
   settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.2V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-2.7-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.2-2.7H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.2-2.7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3 1.6 1.6 0 0 0 .9-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.2 2.7H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5.9z"/>',
@@ -367,19 +369,47 @@ function exportJSON(){
   mascotHappy();say("สำรองข้อมูลแล้ว");
   if(typeof confetti==="function")confetti({particleCount:50,spread:55,origin:{y:.7},colors:["#8b7bd8","#3fb285","#d6a626"],scalar:.8})}
 
-function importJSON(file){
-  const rd=new FileReader();
+function parseCSV(text){
+  text=text.replace(/^﻿/,"").replace(/\r\n/g,"\n").trim();
+  const lines=text.split("\n").filter(l=>l.trim());
+  if(!lines.length)return [];
+  function cells(line){const out=[];let cur="",q=false;
+    for(let i=0;i<line.length;i++){const c=line[i];
+      if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}
+      else if(c===","&&!q){out.push(cur);cur=""}else cur+=c}
+    out.push(cur);return out.map(s=>s.trim())}
+  let rows=lines.map(cells);
+  const head=rows[0].join("").replace(/\s/g,"");
+  const hasHeader=/วันที่|รายการ|หมวด|จำนวน|date|title|cat|amount/i.test(head);
+  if(hasHeader)rows=rows.slice(1);
+  return rows.map((r,i)=>({id:Date.now()+i,date:r[0]||todayStr(0),title:r[1]||"รายการ",cat:r[2]||"อื่นๆ",amount:Number(String(r[3]||"").replace(/[^0-9.\-]/g,""))||0}))}
+
+function normalize(arr){return arr.filter(x=>x&&x.amount).map((x,i)=>({
+  id:x.id||Date.now()+i,title:String(x.title||x.cat||"รายการ"),
+  amount:Number(x.amount)||0,cat:x.cat||"อื่นๆ",date:x.date||todayStr(0)}))}
+
+function importFile(file){
+  const rd=new FileReader();const isCSV=/\.csv$/i.test(file.name);
   rd.onload=()=>{try{
-    const d=JSON.parse(rd.result);
-    const arr=Array.isArray(d)?d:(d.items||[]);
-    if(!Array.isArray(arr))throw 0;
-    const clean=arr.filter(x=>x&&x.amount).map((x,i)=>({
-      id:x.id||Date.now()+i,title:String(x.title||x.cat||"รายการ"),
-      amount:Number(x.amount)||0,cat:x.cat||"อื่นๆ",date:x.date||todayStr(0)}));
+    let arr;
+    if(isCSV){arr=parseCSV(rd.result)}
+    else{const d=JSON.parse(rd.result);arr=Array.isArray(d)?d:(d.items||[])}
+    const clean=normalize(arr);
     if(!clean.length)throw 0;
     items=clean;save();go("home");render(true);mascotHappy();say("นำเข้าข้อมูลแล้ว "+clean.length+" รายการ");
-  }catch(e){alert("ไฟล์ไม่ถูกต้อง — ต้องเป็นไฟล์ JSON ที่ export จาก Spendly")}};
+  }catch(e){alert("ไฟล์ไม่ถูกต้อง — รองรับไฟล์ .json (export จาก Spendly) หรือ .csv (ตาม template)")}};
   rd.readAsText(file)}
+
+function downloadTemplate(){
+  const rows=[["วันที่","รายการ","หมวด","จำนวนเงิน"],
+    [todayStr(0),"กาแฟเช้า","อาหาร","75"],
+    [todayStr(0),"ค่าเดินทาง","เดินทาง","60"],
+    [todayStr(0),"ข้าวกลางวัน","อาหาร","120"]];
+  const csv=rows.map(r=>r.map(c=>/[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c).join(",")).join("\n");
+  const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");
+  a.href=url;a.download="spendly-template.csv";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  say("ดาวน์โหลด template แล้ว เปิดใน Excel ได้เลย")}
 const $=id=>document.getElementById(id);
 $("date").value=todayStr(0);
 
@@ -403,7 +433,8 @@ $("scrim").onclick=closeSheet;
 
 $("exportBtn").onclick=exportJSON;
 $("importBtn").onclick=()=>$("importFile").click();
-$("importFile").onchange=e=>{if(e.target.files[0]){importJSON(e.target.files[0]);e.target.value=""}};
+$("importFile").onchange=e=>{if(e.target.files[0]){importFile(e.target.files[0]);e.target.value=""}};
+$("tmplBtn").onclick=downloadTemplate;
 function openConfirm(){$("confirmScrim").classList.add("on");$("confirmModal").classList.add("on")}
 function closeConfirm(){$("confirmScrim").classList.remove("on");$("confirmModal").classList.remove("on")}
 $("clearBtn").onclick=openConfirm;
