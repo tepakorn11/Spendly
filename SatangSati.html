@@ -43,6 +43,13 @@ body[data-theme="minimal"]{
   --sky:#e7e7ea; --sky-d:#6b6b73; --rose:#ededf0; --rose-d:#71717a;
   --card:#ffffff; --line:#e2e2e6; --bg-outer:#e6e6ea;
 }
+body[data-theme="dark"]{
+  --bg:#1c1d24; --bg-outer:#141519; --ink:#e8e6f0; --muted:#8b8a99; --dim:#5a5968;
+  --lav:#3a3450; --lav-d:#b9a8ff; --mint:#22463c; --mint-d:#4fe0a8;
+  --peach:#4a2f26; --peach-d:#ff9d7a; --butter:#473d1e; --butter-d:#ecc75a;
+  --sky:#243a4d; --sky-d:#74c0ff; --rose:#45283a; --rose-d:#ff8fc0;
+  --card:#262732; --line:#34343f;
+}
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Nunito',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--bg-outer);min-height:100vh;transition:background .3s}
@@ -321,6 +328,7 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
           <button class="thbtn" data-theme="earth"><span class="sw"><i style="background:#e3d6c3"></i><i style="background:#d8e0c4"></i><i style="background:#ecd3bf"></i></span>เรียลบ้านๆ</button>
           <button class="thbtn" data-theme="fun"><span class="sw"><i style="background:#e0d4ff"></i><i style="background:#caffd8"></i><i style="background:#ffd1e8"></i></span>สนุก</button>
           <button class="thbtn" data-theme="minimal"><span class="sw"><i style="background:#e7e7ea"></i><i style="background:#cdcdd3"></i><i style="background:#2a2a2e"></i></span>มินิมอล</button>
+          <button class="thbtn" data-theme="dark"><span class="sw"><i style="background:#3a3450"></i><i style="background:#262732"></i><i style="background:#1c1d24"></i></span>โหมดมืด</button>
         </div>
       </div>
       <div class="card">
@@ -735,7 +743,7 @@ function render(pulse){
 function drawDonut(by){const labels=Object.keys(by),data=Object.values(by),cols=labels.map(l=>cmap[l]||"#888");
   if(donut)donut.destroy();if(!$("donut"))return;
   donut=new Chart($("donut"),{type:"doughnut",
-    data:{labels,datasets:[{data,backgroundColor:cols,borderColor:"#fffdf8",borderWidth:3,hoverOffset:7}]},
+    data:{labels,datasets:[{data,backgroundColor:cols,borderColor:(getComputedStyle(document.body).getPropertyValue("--card").trim()||"#fffdf8"),borderWidth:3,hoverOffset:7}]},
     options:{cutout:"66%",animation:{animateRotate:true,duration:950,easing:"easeOutQuart"},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+c.label+": "+baht(c.parsed)}}}}});
   const tot=data.reduce((s,v)=>s+v,0)||1;
