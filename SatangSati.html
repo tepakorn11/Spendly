@@ -19,7 +19,7 @@
   --lav:#e4ddf5; --lav-d:#8b7bd8; --mint:#d2ecdf; --mint-d:#3fb285;
   --peach:#f7ddd0; --peach-d:#e8895f; --butter:#f6ecc6; --butter-d:#c99f2a;
   --sky:#d6e7f7; --sky-d:#5b9bd5; --rose:#f7dde8; --rose-d:#dd6b97;
-  --card:#faf7f0; --line:#e4dfd3;
+  --card:#faf7f0; --line:#e4dfd3; --bg-outer:#e3ddcf;
 }
 
 body[data-theme="earth"]{
@@ -27,28 +27,28 @@ body[data-theme="earth"]{
   --lav:#e3d6c3; --lav-d:#9c7b54; --mint:#d8e0c4; --mint-d:#6b8e4e;
   --peach:#ecd3bf; --peach-d:#c0764a; --butter:#f0e2c0; --butter-d:#bb8b3a;
   --sky:#d6dfd0; --sky-d:#6f8a73; --rose:#ecd2c8; --rose-d:#bd7a64;
-  --card:#f6efe2; --line:#ddd0bb;
+  --card:#f6efe2; --line:#ddd0bb; --bg-outer:#ddd2bd;
 }
 body[data-theme="fun"]{
   --bg:#fff4e6; --ink:#3a2a4d; --muted:#9a86a8; --dim:#d8c4e0;
   --lav:#e0d4ff; --lav-d:#7c4dff; --mint:#caffd8; --mint-d:#10b981;
   --peach:#ffd6c2; --peach-d:#ff6b3d; --butter:#fff0a8; --butter-d:#f5a300;
   --sky:#c8e8ff; --sky-d:#2f9bff; --rose:#ffd1e8; --rose-d:#ff4d97;
-  --card:#ffffff; --line:#ffe0c2;
+  --card:#ffffff; --line:#ffe0c2; --bg-outer:#ffe6cc;
 }
 body[data-theme="minimal"]{
   --bg:#f4f4f5; --ink:#2a2a2e; --muted:#9b9ba3; --dim:#cdcdd3;
   --lav:#e7e7ea; --lav-d:#6b6b73; --mint:#e7e7ea; --mint-d:#5a5a62;
   --peach:#ededf0; --peach-d:#71717a; --butter:#ededf0; --butter-d:#71717a;
   --sky:#e7e7ea; --sky-d:#6b6b73; --rose:#ededf0; --rose-d:#71717a;
-  --card:#ffffff; --line:#e2e2e6;
+  --card:#ffffff; --line:#e2e2e6; --bg-outer:#e6e6ea;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Nunito',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh}
+body{font-family:'Nunito',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--bg-outer);min-height:100vh;transition:background .3s}
 svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;display:block;flex-shrink:0}
 
-.app{max-width:460px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.06)}
+.app{max-width:460px;margin:0 auto;min-height:100vh;background:var(--bg);transition:background .3s;position:relative;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.06)}
 @media(min-width:480px){.app{margin:18px auto;min-height:calc(100vh - 36px);border-radius:30px;overflow:hidden;border:1px solid var(--line)}}
 
 .top{padding:20px 20px 8px;display:flex;align-items:center;gap:12px}
