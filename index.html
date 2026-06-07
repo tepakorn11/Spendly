@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>Spendly · จดรายจ่าย</title>
+<title>SatangSati · จดรายจ่าย</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#e7e0ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Spendly">
+<meta name="apple-mobile-web-app-title" content="SatangSati">
 <link rel="apple-touch-icon" href="icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -291,7 +291,7 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
       </div>
       <div class="card">
         <div class="ct"><span class="ic" data-i="rabbit"></span>เกี่ยวกับ</div>
-        <div class="cs" style="margin:0">Spendly · แอปจดรายจ่ายส่วนตัว<br>ข้อมูลเก็บในเครื่องคุณเท่านั้น ไม่ส่งขึ้นเซิร์ฟเวอร์</div>
+        <div class="cs" style="margin:0">SatangSati · มีสติเรื่องเงิน<br>ข้อมูลเก็บในเครื่องคุณเท่านั้น ไม่ส่งขึ้นเซิร์ฟเวอร์</div>
       </div>
     </div>
   </div>
@@ -471,7 +471,7 @@ function addSub(){
   mascotHappy();say("เพิ่มบิลประจำแล้ว");renderSubs()}
 
 function exportJSON(){
-  const data={app:"Spendly",version:1,exportedAt:new Date().toISOString(),items};
+  const data={app:"SatangSati",version:1,exportedAt:new Date().toISOString(),items};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);const a=document.createElement("a");
   a.href=url;a.download="spendly-data-"+todayStr(0)+".json";a.click();
@@ -507,7 +507,7 @@ function importFile(file){
     const clean=normalize(arr);
     if(!clean.length)throw 0;
     items=clean;save();go("home");render(true);mascotHappy();say("นำเข้าข้อมูลแล้ว "+clean.length+" รายการ");
-  }catch(e){alert("ไฟล์ไม่ถูกต้อง — รองรับไฟล์ .json (export จาก Spendly) หรือ .csv (ตาม template)")}};
+  }catch(e){alert("ไฟล์ไม่ถูกต้อง — รองรับไฟล์ .json (export จาก SatangSati) หรือ .csv (ตาม template)")}};
   rd.readAsText(file)}
 
 function downloadTemplate(){
