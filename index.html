@@ -314,26 +314,26 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
   <div class="scrim" id="scrim"></div>
   <div class="sheet" id="sheet">
     <div class="grab"></div>
-    <h3><span class="ic" data-i="sparkle"></span>เพิ่มรายการใหม่</h3>
+    <h3><span class="ic" data-i="sparkle"></span><span id="sheetTitle">เพิ่มรายการใหม่</span></h3>
     <div class="chips" id="qchips"></div>
     <div class="fin"><input id="title" placeholder="รายการ เช่น กาแฟ" maxlength="40"></div>
     <div class="tworow">
       <div class="fin"><input id="amount" type="number" min="0" step="1" placeholder="จำนวน" inputmode="numeric"><span class="cur">฿</span></div>
       <div class="fin"><input id="date" type="date"></div>
     </div>
-    <button class="savebtn" id="save"><span class="ic" data-i="check"></span>บันทึก</button>
+    <button class="savebtn" id="save"><span class="ic" data-i="check"></span><span class="lbl">บันทึก</span></button>
   </div>
   <div class="scrim" id="subScrim"></div>
   <div class="sheet" id="subSheet">
     <div class="grab"></div>
-    <h3><span class="ic" data-i="bell"></span>เพิ่มบิลประจำ</h3>
+    <h3><span class="ic" data-i="bell"></span><span id="subSheetTitle">เพิ่มบิลประจำ</span></h3>
     <div class="fin"><input id="subName" placeholder="ชื่อบิล เช่น Netflix, โดเมน" maxlength="40"></div>
     <div class="tworow">
       <div class="fin"><input id="subAmount" type="number" min="0" step="1" placeholder="จำนวน" inputmode="numeric"><span class="cur">฿</span></div>
       <div class="fin"><select id="subCycle" style="font-family:inherit;width:100%;background:var(--card);border:2.5px solid var(--ink);color:var(--ink);padding:15px 12px;border-radius:16px;font-size:15px;font-weight:700;outline:none"><option value="month">ทุกเดือน</option><option value="year">ทุกปี</option></select></div>
     </div>
     <div class="fin"><label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin:0 0 6px 4px">วันเริ่ม / รอบล่าสุด</label><input id="subStart" type="date"></div>
-    <button class="savebtn" id="subSave"><span class="ic" data-i="check"></span>บันทึกบิล</button>
+    <button class="savebtn" id="subSave"><span class="ic" data-i="check"></span><span class="lbl">บันทึกบิล</span></button>
   </div>
   <div class="scrim" id="confirmScrim"></div>
   <div class="confirm-modal" id="confirmModal">
@@ -438,6 +438,7 @@ function mergeSeedSubs(){
     return added;
   }catch(e){return 0}}
 let subs=loadSubs();mergeSeedSubs();
+let editId=null, editSubId=null;
 
 function addDays(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d}
 function addCycle(ds,cycle){const d=new Date(ds);if(cycle==="year")d.setFullYear(d.getFullYear()+1);else d.setMonth(d.getMonth()+1);return d}
@@ -464,7 +465,7 @@ function subCardHTML(s,idx){
     const amtTxt=s.amount>0?baht(s.amount):"ฟรี";
     return `<div class="subcard ${left<=30?'due':''}" style="animation-delay:${idx*0.05}s">
       <div class="subtop">
-        <div class="subname"><div class="sdot">${svg(s.icon||"bell")}</div>
+        <div class="subname" data-editsub="${s.id}" style="cursor:pointer"><div class="sdot">${svg(s.icon||"bell")}</div>
           <div><div class="nm">${esc(s.name)}</div><div class="cy">${s.cycle==="year"?"ทุกปี":"ทุกเดือน"} · ครบ ${dueStr}</div></div></div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="subamt">${amtTxt}<span class="per">${s.amount>0?(s.cycle==="year"?"/ปี":"/เดือน"):""}</span></div>
@@ -491,17 +492,22 @@ function renderSubs(){
   document.querySelectorAll("#subsWrap [data-i]").forEach(el=>el.innerHTML=svg(el.dataset.i));
   requestAnimationFrame(()=>document.querySelectorAll(".subfill").forEach(f=>f.style.width=f.dataset.w+"%"));
   document.querySelectorAll(".subdel").forEach(b=>b.onclick=()=>{subs=subs.filter(x=>x.id!=b.dataset.sid);saveSubs();renderSubs();say("ลบบิลแล้ว")});
+  document.querySelectorAll("[data-editsub]").forEach(el=>el.onclick=()=>{const s=subs.find(x=>x.id==el.dataset.editsub);if(s)openSubSheet(s)});
 }
 
-function openSubSheet(){$("subStart").value=todayStr(0);$("subScrim").classList.add("on");$("subSheet").classList.add("on")}
-function closeSubSheet(){$("subScrim").classList.remove("on");$("subSheet").classList.remove("on")}
+function openSubSheet(s){
+  editSubId = s?s.id:null;
+  if(s){$("subName").value=s.name;$("subAmount").value=s.amount;$("subCycle").value=s.cycle;$("subStart").value=s.start;$("subSheetTitle").textContent="แก้ไขบิลประจำ";$("subSave").querySelector(".lbl").textContent="บันทึกการแก้ไข"}
+  else{$("subName").value="";$("subAmount").value="";$("subCycle").value="month";$("subStart").value=todayStr(0);$("subSheetTitle").textContent="เพิ่มบิลประจำ";$("subSave").querySelector(".lbl").textContent="บันทึกบิล"}
+  $("subScrim").classList.add("on");$("subSheet").classList.add("on")}
+function closeSubSheet(){$("subScrim").classList.remove("on");$("subSheet").classList.remove("on");editSubId=null}
 function addSub(){
   const n=$("subName").value.trim();const a=parseFloat($("subAmount").value);
   if(!n){flash($("subName"));return}
-  if(!a||a<=0){flash($("subAmount"));return}
+  if(isNaN(a)||a<0){flash($("subAmount"));return}
+  if(editSubId){const s=subs.find(x=>x.id===editSubId);if(s){s.name=n;s.amount=a;s.cycle=$("subCycle").value;s.start=$("subStart").value||todayStr(0)}saveSubs();closeSubSheet();renderSubs();mascotHappy();say("แก้ไขบิลแล้ว");return}
   subs.unshift({id:Date.now(),name:n,amount:a,cycle:$("subCycle").value,start:$("subStart").value||todayStr(0),icon:"bell"});
   saveSubs();closeSubSheet();
-  $("subName").value="";$("subAmount").value="";
   if(typeof confetti==="function")confetti({particleCount:60,spread:60,origin:{y:.8},colors:["#8b7bd8","#3fb285","#d6a626"],scalar:.85});
   mascotHappy();say("เพิ่มบิลประจำแล้ว");renderSubs()}
 
@@ -572,8 +578,13 @@ function go(p){cur=p;
   if(p==="subs")renderSubs()}
 document.querySelectorAll("[data-go]").forEach(el=>el.onclick=()=>go(el.dataset.go));
 
-function openSheet(){$("scrim").classList.add("on");$("sheet").classList.add("on")}
-function closeSheet(){$("scrim").classList.remove("on");$("sheet").classList.remove("on")}
+function openSheet(it){
+  editId = it?it.id:null;
+  if(it){selCat=it.cat;$("title").value=it.title;$("amount").value=it.amount;$("date").value=it.date;$("sheetTitle").textContent="แก้ไขรายการ";$("save").querySelector(".lbl").textContent="บันทึกการแก้ไข"}
+  else{$("title").value="";$("amount").value="";$("date").value=todayStr(0);$("sheetTitle").textContent="เพิ่มรายการใหม่";$("save").querySelector(".lbl").textContent="บันทึก"}
+  renderChips();
+  $("scrim").classList.add("on");$("sheet").classList.add("on")}
+function closeSheet(){$("scrim").classList.remove("on");$("sheet").classList.remove("on");editId=null}
 $("fab").onclick=openSheet;
 if($("addSubBtn"))$("addSubBtn").onclick=openSubSheet;
 if($("subScrim"))$("subScrim").onclick=closeSubSheet;
@@ -605,6 +616,7 @@ function flyCoin(x,y){const c=document.createElement("div");c.className="coin";c
 function addItem(){
   const t=$("title").value.trim();const a=parseFloat($("amount").value);
   if(!a||a<=0){flash($("amount"));return}
+  if(editId){const it=items.find(x=>x.id===editId);if(it){it.title=t||selCat;it.amount=a;it.cat=selCat;it.date=$("date").value||todayStr(0)}save();closeSheet();render(true);mascotHappy();say("แก้ไขแล้ว");return}
   items.unshift({id:Date.now(),title:t||selCat,amount:a,cat:selCat,date:$("date").value||todayStr(0)});save();
   const r=$("save").getBoundingClientRect();flyCoin(r.left+r.width/2-14,r.top);
   if(typeof confetti==="function")confetti({particleCount:80,spread:66,origin:{y:.8},colors:["#8b7bd8","#3fb285","#d6a626","#e8895f","#5b9bd5"],scalar:.9});
@@ -624,7 +636,7 @@ function countTo(el,target,prefix="฿"){const start=parseFloat(el.dataset.v||0)
 function monthItems(){return items.filter(i=>i.date.startsWith(todayStr(0).slice(0,7)))}
 function monthBy(){const by={};monthItems().forEach(i=>by[i.cat]=(by[i.cat]||0)+i.amount);return by}
 
-function itemHTML(i,delay){return `<li class="item" style="animation-delay:${delay}s"><div class="info"><div class="dot" style="background:${hex2bg(cmap[i.cat])}">${svg(imap[i.cat]||"box")}</div><div><div class="tt">${esc(i.title)}</div><div class="cc">${i.cat} · ${fmtDate(i.date)}</div></div></div><div class="right"><span class="amt">${baht(i.amount)}</span><button class="del" data-id="${i.id}" title="ลบ">${svg("trash")}</button></div></li>`}
+function itemHTML(i,delay){return `<li class="item" style="animation-delay:${delay}s"><div class="info" data-edit="${i.id}" style="cursor:pointer"><div class="dot" style="background:${hex2bg(cmap[i.cat])}">${svg(imap[i.cat]||"box")}</div><div><div class="tt">${esc(i.title)}</div><div class="cc">${i.cat} · ${fmtDate(i.date)}</div></div></div><div class="right"><span class="amt">${baht(i.amount)}</span><button class="del" data-id="${i.id}" title="ลบ">${svg("trash")}</button></div></li>`}
 
 function render(pulse){
   renderChips();
@@ -641,6 +653,7 @@ function render(pulse){
   if(!shown.length){list.innerHTML=`<div class="empty"><div class="be">${svg("carrot")}</div>ยังไม่มีรายการ${filter!=="ทั้งหมด"?"ในหมวดนี้":""}</div>`}
   else{list.innerHTML=shown.map((i,x)=>itemHTML(i,x*0.035)).join("")}
   document.querySelectorAll(".del").forEach(b=>b.onclick=()=>del(+b.dataset.id,b.closest(".item")));
+  document.querySelectorAll("[data-edit]").forEach(el=>el.onclick=()=>{const it=items.find(x=>x.id===+el.dataset.edit);if(it)openSheet(it)});
 
   const total=monthItems().reduce((s,i)=>s+i.amount,0);const day=new Date().getDate();
   countTo($("sumMonth"),total);countTo($("avgDay"),total/day);countTo($("remain"),Math.max(MONTHLY_BUDGET-total,0));countTo($("dTotal"),total);countTo($("cnt"),items.length,"");
