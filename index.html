@@ -411,7 +411,12 @@ const SUBS_KEY="spendly_subs_v1";
 function loadSubs(){try{const s=localStorage.getItem(SUBS_KEY);if(s)return JSON.parse(s)}catch(e){}
   return [
     {id:1,name:"โดเมน attenly.in.th",amount:400,cycle:"year",start:"2026-06-07",icon:"calendar"},
-    {id:2,name:"Claude Max",amount:3290,cycle:"month",start:"2026-05-07",icon:"sparkle"}
+    {id:2,name:"Claude Max",amount:3290,cycle:"month",start:"2026-05-07",icon:"sparkle"},
+    {id:3,name:"Gemini Pro",amount:6500,cycle:"year",start:"2025-10-15",icon:"sparkle"},
+    {id:4,name:"VPS Hostinger + executeflow.cloud",amount:619,cycle:"year",start:"2026-02-23",icon:"box"},
+    {id:5,name:"โดเมน billokey.com",amount:344,cycle:"year",start:"2026-01-21",icon:"calendar"},
+    {id:6,name:"ChatGPT Plus",amount:750,cycle:"month",start:"2026-05-21",icon:"sparkle"},
+    {id:7,name:"YouTube Premium",amount:249,cycle:"month",start:"2026-06-07",icon:"bell"}
   ]}
 function saveSubs(){try{localStorage.setItem(SUBS_KEY,JSON.stringify(subs))}catch(e){}}
 
