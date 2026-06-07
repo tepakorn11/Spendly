@@ -237,15 +237,9 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
         <div class="lbl"><span class="ic" data-i="wallet"></span> รายจ่ายเดือนนี้</div>
         <div class="big" id="sumMonth">฿0</div>
         <div class="sub" id="mLabel"></div>
-        <div class="ringrow">
-          <svg class="ring" viewBox="0 0 42 42"><circle cx="21" cy="21" r="17" fill="none" stroke="rgba(59,58,74,.15)" stroke-width="5"/>
-            <circle id="ringFg" cx="21" cy="21" r="17" fill="none" stroke="#3fb285" stroke-width="5" stroke-linecap="round"
-              stroke-dasharray="107" stroke-dashoffset="107" transform="rotate(-90 21 21)" style="transition:stroke-dashoffset 1s cubic-bezier(.2,.9,.3,1),stroke .4s"/></svg>
-          <span class="rt" id="ringTxt">ใช้ไป 0%</span>
-        </div>
       </div>
       <div class="minis">
-        <div class="mini mint"><div class="l"><span class="ic" data-i="piggy"></span>คงเหลือ</div><div class="v" id="remain">฿0</div></div>
+        <div class="mini mint"><div class="l"><span class="ic" data-i="wallet"></span>รวมทั้งหมด</div><div class="v" id="remain">฿0</div></div>
         <div class="mini peach"><div class="l"><span class="ic" data-i="chart"></span>เฉลี่ย/วัน</div><div class="v" id="avgDay">฿0</div></div>
         <div class="mini sky"><div class="l"><span class="ic" data-i="receipt"></span>รายการ</div><div class="v" id="cnt">0</div></div>
       </div>
@@ -272,10 +266,6 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
         <div class="donut-wrap"><canvas id="donut"></canvas>
           <div class="donut-center"><div class="big" id="dTotal">฿0</div><div class="sm">รวม</div></div></div>
         <div class="legend" id="legend"></div>
-      </div>
-      <div class="card">
-        <div class="ct"><span class="ic" data-i="target"></span>งบแต่ละหมวด</div><div class="cs">ใช้ไปเท่าไหร่จากงบเดือนนี้</div>
-        <div id="bwrap"></div>
       </div>
     </div>
 
@@ -401,7 +391,6 @@ const CATS=[
 const KEY="spendly_app_v2";
 const imap=Object.fromEntries(CATS.map(c=>[c.n,c.i]));
 const cmap=Object.fromEntries(CATS.map(c=>[c.n,c.c]));
-const MONTHLY_BUDGET=CATS.reduce((s,c)=>s+c.b,0);
 const monthNames=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
 const dayNames=["อา","จ","อ","พ","พฤ","ศ","ส"];
 const tips=["วันนี้ใช้เงินยังไงน้า","ออมวันละนิด","จดทุกบาทนะ","เก่งมาก","คุมงบดีๆ น้า"];
@@ -684,19 +673,12 @@ function render(pulse){
   document.querySelectorAll("[data-edit]").forEach(el=>el.onclick=()=>{const it=items.find(x=>x.id===+el.dataset.edit);if(it)openSheet(it)});
 
   const total=monthItems().reduce((s,i)=>s+i.amount,0);const day=new Date().getDate();
-  countTo($("sumMonth"),total);countTo($("avgDay"),total/day);countTo($("remain"),Math.max(MONTHLY_BUDGET-total,0));countTo($("dTotal"),total);countTo($("cnt"),items.length,"");
+  const allTotal=items.reduce((s,i)=>s+i.amount,0);
+  countTo($("sumMonth"),total);countTo($("avgDay"),total/day);countTo($("remain"),allTotal);countTo($("dTotal"),total);countTo($("cnt"),items.length,"");
   $("setCount").textContent=items.length+" รายการ";
-  const pct=Math.min(total/MONTHLY_BUDGET,1);$("ringFg").style.strokeDashoffset=107*(1-pct);
-  $("ringFg").style.stroke=pct>.9?"#e8895f":pct>.7?"#d6a626":"#3fb285";
-  $("ringTxt").textContent="ใช้ไป "+Math.round(pct*100)+"% ของงบ";
-  const now=new Date();$("mLabel").textContent=monthNames[now.getMonth()]+" "+(now.getFullYear()+543)+" · งบ "+baht(MONTHLY_BUDGET);
+  const now=new Date();$("mLabel").textContent=monthNames[now.getMonth()]+" "+(now.getFullYear()+543);
 
   const by=monthBy();
-  $("bwrap").innerHTML=CATS.map((c,idx)=>{const used=by[c.n]||0,p=Math.min(used/c.b*100,100);
-    const col=p>=100?"#e8895f":p>75?"#d6a626":c.c;
-    return `<div class="brow" style="animation-delay:${idx*0.05}s"><div class="bt"><span class="nm"><span class="ic">${svg(c.i)}</span>${c.n}</span><span class="v">${baht(used)} / ${baht(c.b)}</span></div>
-      <div class="track"><div class="fill" data-w="${p}" style="background:${col}"></div></div></div>`}).join("");
-  requestAnimationFrame(()=>document.querySelectorAll(".fill").forEach(f=>f.style.width=f.dataset.w+"%"));
 
   if(cur==="stats"){drawDonut(by);drawTrend()}
   renderSubs();
