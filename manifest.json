@@ -1,0 +1,26 @@
+{
+  "name": "Spendly · จดรายจ่าย",
+  "short_name": "Spendly",
+  "description": "แอปจดรายจ่ายส่วนตัว เก็บข้อมูลในเครื่อง",
+  "lang": "th",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f1ea",
+  "theme_color": "#e7e0ff",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
