@@ -396,7 +396,7 @@ function todayStr(off=0){const d=new Date();d.setDate(d.getDate()+off);return d.
 function baht(n){return "฿"+Math.round(n).toLocaleString("th-TH")}
 
 let items=load(), selCat="อาหาร", filter="ทั้งหมด", range=7, donut, trend, tipIdx=0, cur="home";
-let subs=loadSubs();
+let subs=loadSubs();mergeSeedSubs();
 
 function load(){try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}
   return [{id:1,title:"กาแฟเช้า",amount:75,cat:"อาหาร",date:todayStr(-5)},
@@ -408,8 +408,8 @@ function load(){try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}
     {id:7,title:"กาแฟบ่าย",amount:85,cat:"อาหาร",date:todayStr(0)}]}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}}
 const SUBS_KEY="spendly_subs_v1";
-function loadSubs(){try{const s=localStorage.getItem(SUBS_KEY);if(s)return JSON.parse(s)}catch(e){}
-  return [
+const SEED_SYNC_KEY="spendly_seed_subs_v3";
+const SEED_SUBS=[
     {id:1,name:"โดเมน attenly.in.th",amount:400,cycle:"year",start:"2026-06-07",icon:"calendar"},
     {id:2,name:"Claude Max",amount:3290,cycle:"month",start:"2026-05-07",icon:"sparkle"},
     {id:3,name:"Gemini Pro",amount:6500,cycle:"year",start:"2025-10-15",icon:"sparkle"},
@@ -418,8 +418,20 @@ function loadSubs(){try{const s=localStorage.getItem(SUBS_KEY);if(s)return JSON.
     {id:5,name:"โดเมน billokey.com",amount:344,cycle:"year",start:"2026-01-21",icon:"calendar"},
     {id:6,name:"ChatGPT Plus",amount:750,cycle:"month",start:"2026-05-21",icon:"sparkle"},
     {id:7,name:"YouTube Premium",amount:249,cycle:"month",start:"2026-06-07",icon:"bell"}
-  ]}
+];
+function loadSubs(){try{const s=localStorage.getItem(SUBS_KEY);if(s)return JSON.parse(s)}catch(e){}
+  return SEED_SUBS.map(x=>({...x}))}
 function saveSubs(){try{localStorage.setItem(SUBS_KEY,JSON.stringify(subs))}catch(e){}}
+function mergeSeedSubs(){
+  try{if(localStorage.getItem(SEED_SYNC_KEY))return 0;
+    const norm=s=>(s||"").replace(/\s/g,"").toLowerCase();
+    const have=new Set(subs.map(s=>norm(s.name)));
+    let added=0,maxId=subs.reduce((m,s)=>Math.max(m,+s.id||0),0);
+    SEED_SUBS.forEach(seed=>{if(!have.has(norm(seed.name))){subs.push({...seed,id:++maxId});added++}});
+    localStorage.setItem(SEED_SYNC_KEY,"1");
+    if(added){saveSubs()}
+    return added;
+  }catch(e){return 0}}
 
 function addDays(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d}
 function addCycle(ds,cycle){const d=new Date(ds);if(cycle==="year")d.setFullYear(d.getFullYear()+1);else d.setMonth(d.getMonth()+1);return d}
