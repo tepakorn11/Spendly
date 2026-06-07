@@ -396,7 +396,7 @@ function todayStr(off=0){const d=new Date();d.setDate(d.getDate()+off);return d.
 function baht(n){return "฿"+Math.round(n).toLocaleString("th-TH")}
 
 let items=load(), selCat="อาหาร", filter="ทั้งหมด", range=7, donut, trend, tipIdx=0, cur="home";
-let subs=loadSubs();mergeSeedSubs();
+
 
 function load(){try{const s=localStorage.getItem(KEY);if(s)return JSON.parse(s)}catch(e){}
   return [{id:1,title:"กาแฟเช้า",amount:75,cat:"อาหาร",date:todayStr(-5)},
@@ -432,6 +432,7 @@ function mergeSeedSubs(){
     if(added){saveSubs()}
     return added;
   }catch(e){return 0}}
+let subs=loadSubs();mergeSeedSubs();
 
 function addDays(ds,n){const d=new Date(ds);d.setDate(d.getDate()+n);return d}
 function addCycle(ds,cycle){const d=new Date(ds);if(cycle==="year")d.setFullYear(d.getFullYear()+1);else d.setMonth(d.getMonth()+1);return d}
