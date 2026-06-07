@@ -168,31 +168,28 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
 #confirmScrim{z-index:55}
 
 .setbtn.lav{background:var(--lav)}
-.subcard{background:var(--card);border:2.5px solid var(--ink);border-radius:18px;padding:15px 16px;box-shadow:3px 3px 0 var(--ink);margin-bottom:12px;animation:slidein .5s cubic-bezier(.2,1.2,.3,1) both}
-.subcard.due{border-color:var(--peach-d);box-shadow:3px 3px 0 var(--peach-d)}
-.subtop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
-.subname{display:flex;align-items:center;gap:10px;min-width:0}
-.subname .sdot{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:18px;flex-shrink:0;background:var(--lav);border:2px solid var(--ink)}
-.subname .nm{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.subname .cy{font-size:11.5px;font-weight:600;color:var(--muted)}
+.subcard{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:10px;animation:slidein .5s cubic-bezier(.2,1.2,.3,1) both;transition:transform .15s}
+.subcard:active{transform:scale(.99)}
+.subcard.due{border-color:var(--butter-d)}
+.subtop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.subname{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+.subname .sdot{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:17px;flex-shrink:0;background:var(--lav);color:var(--lav-d)}
+.subname .nm{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.subname .cy{font-size:11.5px;font-weight:600;color:var(--muted);margin-top:1px;display:flex;align-items:center;gap:5px}
+.subname .cy .pdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .subamt{font-size:15px;font-weight:900;text-align:right;white-space:nowrap}
-.subamt .per{display:block;font-size:10px;font-weight:600;color:var(--muted)}
-.subprog{margin-top:11px}
-.subprog .pt{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;margin-bottom:6px}
-.subprog .pt .left{color:var(--muted)}
-.subprog .pt .day{font-weight:800}
-.subtrack{height:10px;background:rgba(0,0,0,.06);border:2px solid var(--ink);border-radius:9px;overflow:hidden}
-.subfill{height:100%;width:0;border-radius:7px;transition:width 1s cubic-bezier(.2,.9,.3,1)}
-.subdel{background:none;border:none;color:var(--dim);cursor:pointer;font-size:15px;padding:4px;line-height:0;display:grid;place-items:center}
+.subamt .per{display:block;font-size:10px;font-weight:600;color:var(--muted);margin-top:1px}
+.subprog{margin-top:13px;display:flex;align-items:center;gap:10px}
+.subtrack{flex:1;height:5px;background:rgba(125,125,125,.15);border-radius:5px;overflow:hidden}
+.subfill{height:100%;width:0;border-radius:5px;transition:width 1s cubic-bezier(.2,.9,.3,1)}
+.subprog .day{font-size:11.5px;font-weight:800;white-space:nowrap}
+.subdel{background:none;border:none;color:var(--dim);cursor:pointer;font-size:15px;padding:4px;line-height:0;display:grid;place-items:center;flex-shrink:0;opacity:.6}
 .subdel:active{color:var(--peach-d);transform:scale(1.2)}
-.subbadge{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:20px;border:2px solid var(--ink)}
-.subbadge.ok{background:var(--mint)}.subbadge.soon{background:var(--butter)}.subbadge.over{background:var(--rose);color:var(--peach-d)}
-
-.subgroup{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:900;color:var(--ink);margin:6px 2px 12px}
-.subgroup .ic{font-size:17px;color:var(--butter-d)}
-.subgroup.calm{margin-top:22px}.subgroup.calm .ic{color:var(--mint-d)}
-.subgroup .gcount{background:var(--ink);color:var(--bg);font-size:11px;font-weight:800;border-radius:20px;padding:1px 9px}
-.subgroup .gsum{margin-left:auto;font-size:12px;font-weight:800;color:var(--muted)}
+.subgroup{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--muted);margin:4px 4px 12px;letter-spacing:.3px}
+.subgroup .ic{font-size:15px}
+.subgroup.calm{margin-top:24px}
+.subgroup .gcount{color:var(--muted)}
+.subgroup .gsum{margin-left:auto;font-size:13px;font-weight:900;color:var(--ink)}
 .logoS{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:var(--lav-d);line-height:1}
 .themes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
 .thbtn{font-family:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:var(--card);border:2.5px solid var(--ink);border-radius:16px;padding:13px 14px;cursor:pointer;font-size:13px;font-weight:800;color:var(--ink);box-shadow:2px 2px 0 var(--ink);transition:.15s}
@@ -512,17 +509,17 @@ function subCardHTML(s,idx){
     else{badge="ปกติ";bcls="ok";col="#3fb285"}
     const leftTxt=left<0?("เลย "+Math.abs(left)+" วัน"):(left===0?"ครบวันนี้":("อีก "+left+" วัน"));
     const amtTxt=s.amount>0?baht(s.amount):"ฟรี";
-    return `<div class="subcard ${left<=30?'due':''}" style="animation-delay:${idx*0.05}s">
+    return `<div class="subcard ${left<=7?'due':''}" style="animation-delay:${idx*0.05}s">
       <div class="subtop">
-        <div class="subname" data-editsub="${s.id}" style="cursor:pointer"><div class="sdot">${svg(s.icon||"bell")}</div>
-          <div><div class="nm">${esc(s.name)}</div><div class="cy">${s.cycle==="year"?"ทุกปี":"ทุกเดือน"} · ครบ ${dueStr}</div></div></div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div class="subname" data-editsub="${s.id}"><div class="sdot">${svg(s.icon||"bell")}</div>
+          <div style="min-width:0"><div class="nm">${esc(s.name)}</div><div class="cy"><span class="pdot" style="background:${col}"></span>ครบ ${dueStr}</div></div></div>
+        <div style="display:flex;align-items:center;gap:6px">
           <div class="subamt">${amtTxt}<span class="per">${s.amount>0?(s.cycle==="year"?"/ปี":"/เดือน"):""}</span></div>
           <button class="subdel" data-sid="${s.id}">${svg("trash")}</button></div>
       </div>
       <div class="subprog">
-        <div class="pt"><span class="left"><span class="subbadge ${bcls}">${badge}</span></span><span class="day" style="color:${col}">${leftTxt}</span></div>
         <div class="subtrack"><div class="subfill" data-w="${pct}" style="background:${col}"></div></div>
+        <span class="day" style="color:${col}">${leftTxt}</span>
       </div></div>`}
 
 function renderSubs(){
