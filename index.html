@@ -192,6 +192,7 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
 .subgroup .ic{font-size:17px;color:var(--butter-d)}
 .subgroup.calm{margin-top:22px}.subgroup.calm .ic{color:var(--mint-d)}
 .subgroup .gcount{background:var(--ink);color:var(--bg);font-size:11px;font-weight:800;border-radius:20px;padding:1px 9px}
+.subgroup .gsum{margin-left:auto;font-size:12px;font-weight:800;color:var(--muted)}
 .logoS{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:var(--lav-d);line-height:1}
 .themes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
 .thbtn{font-family:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:var(--card);border:2.5px solid var(--ink);border-radius:16px;padding:13px 14px;cursor:pointer;font-size:13px;font-weight:800;color:var(--ink);box-shadow:2px 2px 0 var(--ink);transition:.15s}
@@ -531,11 +532,12 @@ function renderSubs(){
   if($("subMonthly")) $("subMonthly").textContent=baht(monthly);
   if(!subs.length){$("subsWrap").innerHTML=`<div class="empty"><div class="be">${svg("bell")}</div>ยังไม่มีบิลประจำ<div class="hint">กดปุ่มข้างล่างเพื่อเพิ่ม</div></div>`;return}
   const sorted=[...subs].sort((a,b)=>daysLeft(a)-daysLeft(b));
-  const soon=sorted.filter(s=>daysLeft(s)<=30);
-  const later=sorted.filter(s=>daysLeft(s)>30);
+  const monthlyG=sorted.filter(s=>s.cycle==="month");
+  const yearlyG=sorted.filter(s=>s.cycle==="year");
+  const sum=arr=>arr.reduce((t,s)=>t+s.amount,0);
   let html="";
-  if(soon.length){html+=`<div class="subgroup"><span class="ic" data-i="alert"></span>ใกล้ครบกำหนด <span class="gcount">${soon.length}</span></div>`+soon.map((s,i)=>subCardHTML(s,i)).join("")}
-  if(later.length){html+=`<div class="subgroup calm"><span class="ic" data-i="calendar"></span>ยังอีกนาน <span class="gcount">${later.length}</span></div>`+later.map((s,i)=>subCardHTML(s,i)).join("")}
+  if(monthlyG.length){html+=`<div class="subgroup"><span class="ic" data-i="calendar"></span>รายเดือน <span class="gcount">${monthlyG.length}</span><span class="gsum">${baht(sum(monthlyG))}/เดือน</span></div>`+monthlyG.map((s,i)=>subCardHTML(s,i)).join("")}
+  if(yearlyG.length){html+=`<div class="subgroup calm"><span class="ic" data-i="bell"></span>รายปี <span class="gcount">${yearlyG.length}</span><span class="gsum">${baht(sum(yearlyG))}/ปี</span></div>`+yearlyG.map((s,i)=>subCardHTML(s,i)).join("")}
   $("subsWrap").innerHTML=html;
   document.querySelectorAll("#subsWrap [data-i]").forEach(el=>el.innerHTML=svg(el.dataset.i));
   requestAnimationFrame(()=>document.querySelectorAll(".subfill").forEach(f=>f.style.width=f.dataset.w+"%"));
