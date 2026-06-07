@@ -15,11 +15,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
 <style>
 :root{
-  --bg:#f4f1ea; --ink:#3b3a4a; --muted:#9a96a8; --dim:#bdb9c8;
-  --lav:#e7e0ff; --lav-d:#8b7bd8; --mint:#d6f3e4; --mint-d:#3fb285;
-  --peach:#ffe3d6; --peach-d:#e8895f; --butter:#fff1c9; --butter-d:#d6a626;
-  --sky:#d9ecff; --sky-d:#5b9bd5; --rose:#ffe0ec; --rose-d:#dd6b97;
-  --card:#fffdf8; --line:#e9e4d8;
+  --bg:#efece3; --ink:#4a4858; --muted:#9a96a8; --dim:#c2bfb4;
+  --lav:#e4ddf5; --lav-d:#8b7bd8; --mint:#d2ecdf; --mint-d:#3fb285;
+  --peach:#f7ddd0; --peach-d:#e8895f; --butter:#f6ecc6; --butter-d:#c99f2a;
+  --sky:#d6e7f7; --sky-d:#5b9bd5; --rose:#f7dde8; --rose-d:#dd6b97;
+  --card:#faf7f0; --line:#e4dfd3;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Nunito',-apple-system,system-ui,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh}
@@ -158,6 +158,11 @@ svg.ic{width:1em;height:1em;stroke:currentColor;stroke-width:2;stroke-linecap:ro
 .subbadge{font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:20px;border:2px solid var(--ink)}
 .subbadge.ok{background:var(--mint)}.subbadge.soon{background:var(--butter)}.subbadge.over{background:var(--rose);color:var(--peach-d)}
 
+.subgroup{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:900;color:var(--ink);margin:6px 2px 12px}
+.subgroup .ic{font-size:17px;color:var(--butter-d)}
+.subgroup.calm{margin-top:22px}.subgroup.calm .ic{color:var(--mint-d)}
+.subgroup .gcount{background:var(--ink);color:var(--bg);font-size:11px;font-weight:800;border-radius:20px;padding:1px 9px}
+.logoS{font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:var(--lav-d);line-height:1}
 .fab{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);z-index:30;
   font-family:inherit;border:2.5px solid var(--ink);border-radius:20px;padding:14px 26px;font-size:16px;font-weight:900;cursor:pointer;
   color:var(--ink);background:var(--mint);box-shadow:0 4px 0 var(--ink),0 8px 18px rgba(59,58,74,.25);
@@ -444,13 +449,7 @@ function daysLeft(s){const now=new Date();now.setHours(0,0,0,0);const due=nextDu
   return Math.round((due-now)/86400000)}
 function cycleDays(s){return s.cycle==="year"?365:30}
 
-function renderSubs(){
-  if(!$("subsWrap"))return;
-  let monthly=0;
-  subs.forEach(s=>monthly+=s.cycle==="year"?s.amount/12:s.amount);
-  if($("subMonthly")) $("subMonthly").textContent=baht(monthly);
-  if(!subs.length){$("subsWrap").innerHTML=`<div class="empty"><div class="be">${svg("bell")}</div>ยังไม่มีบิลประจำ<div class="hint">กดปุ่มข้างล่างเพื่อเพิ่ม</div></div>`;return}
-  $("subsWrap").innerHTML=subs.map((s,idx)=>{
+function subCardHTML(s,idx){
     const left=daysLeft(s),total=cycleDays(s);
     const passed=Math.max(0,Math.min(total,total-left));
     const pct=Math.max(0,Math.min(100,passed/total*100));
@@ -458,21 +457,38 @@ function renderSubs(){
     const dueStr=due.getDate()+" "+monthNames[due.getMonth()]+" "+(due.getFullYear()+543);
     let badge,bcls,col;
     if(left<0){badge="เลยกำหนด";bcls="over";col="#e8895f"}
-    else if(left<=7){badge="ใกล้ครบ!";bcls="soon";col="#d6a626"}
+    else if(left<=7){badge="ใกล้ครบ!";bcls="soon";col="#c99f2a"}
+    else if(left<=30){badge="เร็วๆนี้";bcls="soon";col="#c99f2a"}
     else{badge="ปกติ";bcls="ok";col="#3fb285"}
-    const leftTxt=left<0?("เลย "+Math.abs(left)+" วัน"):("อีก "+left+" วัน");
-    return `<div class="subcard ${left<=7?'due':''}" style="animation-delay:${idx*0.05}s">
+    const leftTxt=left<0?("เลย "+Math.abs(left)+" วัน"):(left===0?"ครบวันนี้":("อีก "+left+" วัน"));
+    const amtTxt=s.amount>0?baht(s.amount):"ฟรี";
+    return `<div class="subcard ${left<=30?'due':''}" style="animation-delay:${idx*0.05}s">
       <div class="subtop">
         <div class="subname"><div class="sdot">${svg(s.icon||"bell")}</div>
           <div><div class="nm">${esc(s.name)}</div><div class="cy">${s.cycle==="year"?"ทุกปี":"ทุกเดือน"} · ครบ ${dueStr}</div></div></div>
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="subamt">${baht(s.amount)}<span class="per">${s.cycle==="year"?"/ปี":"/เดือน"}</span></div>
+          <div class="subamt">${amtTxt}<span class="per">${s.amount>0?(s.cycle==="year"?"/ปี":"/เดือน"):""}</span></div>
           <button class="subdel" data-sid="${s.id}">${svg("trash")}</button></div>
       </div>
       <div class="subprog">
         <div class="pt"><span class="left"><span class="subbadge ${bcls}">${badge}</span></span><span class="day" style="color:${col}">${leftTxt}</span></div>
         <div class="subtrack"><div class="subfill" data-w="${pct}" style="background:${col}"></div></div>
-      </div></div>`}).join("");
+      </div></div>`}
+
+function renderSubs(){
+  if(!$("subsWrap"))return;
+  let monthly=0;
+  subs.forEach(s=>monthly+=s.cycle==="year"?s.amount/12:s.amount);
+  if($("subMonthly")) $("subMonthly").textContent=baht(monthly);
+  if(!subs.length){$("subsWrap").innerHTML=`<div class="empty"><div class="be">${svg("bell")}</div>ยังไม่มีบิลประจำ<div class="hint">กดปุ่มข้างล่างเพื่อเพิ่ม</div></div>`;return}
+  const sorted=[...subs].sort((a,b)=>daysLeft(a)-daysLeft(b));
+  const soon=sorted.filter(s=>daysLeft(s)<=30);
+  const later=sorted.filter(s=>daysLeft(s)>30);
+  let html="";
+  if(soon.length){html+=`<div class="subgroup"><span class="ic" data-i="alert"></span>ใกล้ครบกำหนด <span class="gcount">${soon.length}</span></div>`+soon.map((s,i)=>subCardHTML(s,i)).join("")}
+  if(later.length){html+=`<div class="subgroup calm"><span class="ic" data-i="calendar"></span>ยังอีกนาน <span class="gcount">${later.length}</span></div>`+later.map((s,i)=>subCardHTML(s,i)).join("")}
+  $("subsWrap").innerHTML=html;
+  document.querySelectorAll("#subsWrap [data-i]").forEach(el=>el.innerHTML=svg(el.dataset.i));
   requestAnimationFrame(()=>document.querySelectorAll(".subfill").forEach(f=>f.style.width=f.dataset.w+"%"));
   document.querySelectorAll(".subdel").forEach(b=>b.onclick=()=>{subs=subs.filter(x=>x.id!=b.dataset.sid);saveSubs();renderSubs();say("ลบบิลแล้ว")});
 }
@@ -542,7 +558,7 @@ function downloadTemplate(){
 const $=id=>document.getElementById(id);
 $("date").value=todayStr(0);
 
-function paintStaticIcons(){document.querySelectorAll("[data-i]").forEach(el=>{el.innerHTML=svg(el.dataset.i)});$("mascot").innerHTML=svg("rabbit")}
+function paintStaticIcons(){document.querySelectorAll("[data-i]").forEach(el=>{el.innerHTML=svg(el.dataset.i)});$("mascot").innerHTML='<span class="logoS">S</span>'}
 
 function say(msg){$("speech").textContent=msg}
 function mascotHappy(){const m=$("mascot");m.classList.remove("happy");void m.offsetWidth;m.classList.add("happy")}
